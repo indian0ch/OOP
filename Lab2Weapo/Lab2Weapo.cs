@@ -57,10 +57,14 @@ namespace testlab1weapon
             //  GetLatitudeOfTarget Gl = delegate (double x, double y) { return (y - 500) * (x / 111.2); };
             // GetLatitudeOfTarget GL = (x, y) => { return (y - 500) * (x / 111.2); };
             //GetLatitudeOfTarget GL = (x, y) => (y - 500) * (x / 111.2);
+            //
+            StrikeWeapon stw = new StrikeWeapon(300);
+            stw.Shot();
         }
     }
     public delegate double GetLatitudeOfTarget(double X,double Y);
     public delegate void FuelingHandle(MechanicDriver MD,FuelEventArgs CtrlEvArg);
+    public delegate string ShotHandler(string message);
     interface IMoving
     {
         void Move();
@@ -90,18 +94,21 @@ namespace testlab1weapon
     }
     class StrikeWeapon : Weapon
     {
+        public event ShotHandler NotifyAboutShot;
         public int distanceofstrike;
 
         public StrikeWeapon()
         {
             distanceofstrike = 400;
         }
+        public StrikeWeapon(int distanceofstrike) => this.distanceofstrike = distanceofstrike;
         public override void Print()
         {
             base.Print();
             WriteLine($"Distance of Strike:{distanceofstrike};");
         }
-        public override void Shot() => WriteLine($"You shot from this Strike Weapon and get {damage} of damage!");
+        //WriteLine($"You shot from this Strike Weapon and get {damage} of damage from distance of {distanceofstrike}!")
+        public override void Shot() => NotifyAboutShot.Invoke($"You shot from this Strike Weapon and get {damage} of damage from distance of {distanceofstrike}!");
         public override void Recharge() 
         {
             Random rnd = new Random();
@@ -322,7 +329,7 @@ namespace testlab1weapon
     public class FuelEventArgs : EventArgs
     {
         public int countsoffuel;
-        public FuelEventArgs(int countsoffuel)=>this.countsoffuel = countsoffuel;
+        public FuelEventArgs(int countsoffuel) => this.countsoffuel = countsoffuel;
         public FuelEventArgs() : this(20) { }
     }
     class T64WrongDiametrException : ArgumentException
